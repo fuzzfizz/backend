@@ -1,3 +1,4 @@
+"use server";
 // app/api/route.js
 import { Client } from 'pg';
 import dotenv from 'dotenv';
