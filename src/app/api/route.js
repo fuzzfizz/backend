@@ -12,7 +12,10 @@ export async function GET() {
     const result = await client.query('SELECT * FROM tbl_users');
     return new Response(JSON.stringify(result.rows), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache"
+      },
     });
   } catch (error) {
 
