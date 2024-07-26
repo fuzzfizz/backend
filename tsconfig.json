@@ -22,7 +22,7 @@
     }
   },
   "include": [
-    "src/app/page.js",
+    "src/app/page.tsx",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
