@@ -2,8 +2,8 @@
 // app/api/route.js
 import { Client } from 'pg';
 import dotenv from 'dotenv';
-// import bcrypt from 'bcrypt';
-const bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt';
+// const bcrypt = require('bcrypt');
 dotenv.config();
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
@@ -37,7 +37,9 @@ export async function POST(request) {
   try {
     const { firstname, lastname, username, password } = await request.json();
     // Hash password
-    const res = await client.query('INSERT INTO tbl_users (firstname, lastname, username, password) VALUES ($1, $2, $3, $4) RETURNING *', [firstname, lastname, username, password]);
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const res = await client.query('INSERT INTO tbl_users (firstname, lastname, username, password) VALUES ($1, $2, $3, $4) RETURNING *', [firstname, lastname, username, hashedPassword]);
     return new Response(JSON.stringify(res.rows[0]), {
       status: 201,
       headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
@@ -53,9 +55,10 @@ export async function POST(request) {
 //-------------------------------------------------------------------------------------
 export async function PUT(request) {
   try {
-    const { id, firstname, lastname, password } = await request.json();
+    const { id, firstname, lastname, username, password } = await request.json();
     const hashedPassword = await bcrypt.hash(password, 10);
-    const res = await client.query('UPDATE tbl_users SET firstname = $1, lastname = $2, password = $3 WHERE id = $4 RETURNING *', [firstname, lastname, hashedPassword, id]);
+    const res = await client.query('UPDATE tbl_users SET firstname = $1, lastname = $2, username = $3, password = $4 WHERE id = $5 RETURNING *', [firstname, lastname, username, hashedPassword, id]);
+
     if (res.rows.length === 0) {
       return new Response(JSON.stringify({ error: 'User not found' }), {
         status: 404,
